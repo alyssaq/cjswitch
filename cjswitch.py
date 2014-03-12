@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import requests
-import json
-import csv
+from json import dumps
+from csv import reader
 import os.path
+import re
 from sys import argv
+
+URLREGEX = re.compile('^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*)$')
 
 """ 
 Get CSV or JSON data given a url
@@ -26,12 +29,13 @@ def get_data(url):
   if r.status_code >= 300:
     print '[{0}]: Bad request'.format(r.status_code)
 
-  if r.headers['content-type'] == 'application/json':
+  content_type = r.headers['content-type']
+  if 'application/json' in content_type:
     return r.json()
-  elif r.headers['content-type'] == 'text/csv':
-    return [row for row in csv.reader(r.content.splitlines())]
+  elif 'text/csv' in content_type or 'text/plain' in content_type:
+    return [row for row in reader(r.content.splitlines())]
   else:
-    print('Unhandled content-type')
+    print('Unhandled content-type: ' + content_type)
     return
 
 """ 
@@ -45,7 +49,7 @@ Example: load_csv(os.path.join(os.path.dirname(__file__), 'data.csv'))
 """
 def load_csv(infile):
   with open(infile, 'rU') as f:
-    return [row for row in csv.reader(f)]
+    return [row for row in reader(f)]
 
 """ 
 Main function to convert CSV from disk or url to JSON file.
@@ -59,8 +63,9 @@ Examples:
   csv_to_json('/Documents/data.csv', 'data.json')
   csv_to_json('http://blah.co/data.csv', 'data.json')
 """
+
 def csv_to_json(csv_input, outfile=None):
-  if csv_input.startswith('http://'):
+  if URLREGEX.match(csv_input):
     data = get_data(csv_input)
   elif os.path.isfile(csv_input):
     data = load_csv(csv_input)
@@ -69,14 +74,19 @@ def csv_to_json(csv_input, outfile=None):
     return
 
   if outfile is not None:
-    with io.open(outfile, 'w', encoding='utf-8') as f:
-      f.write(unicode(json.dumps(data, ensure_ascii=False)))
+    from io import open
+    with open(outfile, 'w', encoding='utf-8') as f:
+      f.write(unicode(dumps(data, ensure_ascii=False)))
       print('Done. JSON saved in ' + os.path.basename(outfile))
   else:
     return data
 
 if __name__ == '__main__':
   if len(argv) <= 1:
-    print("Usage: python cjswitch <url or path to csv>")
+    print("Usage: python cjswitch <url or path to csv> <optional:outfile path>")
     exit()
-  csv_to_json(argv[1])
+
+  if len(argv) == 2:
+    csv_to_json(argv[1])
+  else:
+    csv_to_json(argv[1], argv[2])
