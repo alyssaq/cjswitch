@@ -8,18 +8,21 @@ import os.path
 import re
 from sys import argv
 
-URLREGEX = re.compile('^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*)$')
+URLREGEX = re.compile(
+    '^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*'
+    '\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+'
+    '\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*)$')
 
-""" 
-Get CSV or JSON data given a url
 
-Parameters
-----------
-url: URL to csv or json data. 
-
-Example: get_data('http://blah.co/data.csv')
-"""
 def get_data(url):
+  """ Get CSV or JSON data given a url
+
+  Args:
+    url (str): URL to csv or json data.
+
+  Example:
+     get_data('http://blah.co/data.csv')
+  """
   try:
     r = requests.get(url)
   except Exception as err:
@@ -38,33 +41,29 @@ def get_data(url):
     print('Unhandled content-type: ' + content_type)
     return
 
-""" 
-Load CSV file on disk
-
-Parameters
-----------
-infile: full file path to csv file
-
-Example: load_csv(os.path.join(os.path.dirname(__file__), 'data.csv'))
-"""
 def load_csv(infile):
+  """ Load CSV file on disk
+
+  Args:
+    infile (str): full file path to csv file
+
+  Example:
+    load_csv(os.path.join(os.path.dirname(__file__), 'data.csv'))
+  """
   with open(infile, 'rU') as f:
     return [row for row in reader(f)]
 
-""" 
-Main function to convert CSV from disk or url to JSON file.
-
-Parameters
-----------
-csv_input: url or full file path to csv
-outfile: file path to save JSON data
-
-Examples: 
-  csv_to_json('/Documents/data.csv', 'data.json')
-  csv_to_json('http://blah.co/data.csv', 'data.json')
-"""
-
 def csv_to_json(csv_input, outfile=None):
+  """ Main function to convert CSV from disk or url to JSON file.
+
+  Args:
+    csv_input (str): url or full file path to csv
+    outfile (str, optional): file path to save JSON data
+
+  Examples:
+    csv_to_json('/Documents/data.csv', 'data.json')
+    csv_to_json('http://blah.co/data.csv', 'data.json')
+  """
   if URLREGEX.match(csv_input):
     data = get_data(csv_input)
   elif os.path.isfile(csv_input):
@@ -83,7 +82,8 @@ def csv_to_json(csv_input, outfile=None):
 
 if __name__ == '__main__':
   if len(argv) <= 1:
-    print("Usage: python cjswitch <url or path to csv> <optional:outfile path>")
+    print('Usage: python cjswitch '
+          '<url or path to csv> <optional:outfile path>')
     exit()
 
   if len(argv) == 2:
