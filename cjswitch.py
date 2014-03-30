@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+  Author: Alyssa Quek 2014
+"""
+
 import requests
 from json import dumps
 from csv import reader
@@ -30,7 +34,7 @@ def get_data(url):
     raise err
 
   if r.status_code >= 300:
-    print '[{0}]: Bad request'.format(r.status_code)
+    print('[{0}]: Bad request'.format(r.status_code))
 
   content_type = r.headers['content-type']
   if 'application/json' in content_type:

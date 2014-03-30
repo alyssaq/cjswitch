@@ -4,6 +4,8 @@
 Download `CSV` from URL or load `CSV` file from disk and convert to `JSON`   
 Optionally, save the JSON data to file
 
+Runs and tested on Python 2.7.x and 3.3.x   
+
 ## Usage
 
 ```python
