@@ -10,7 +10,7 @@ from json import dumps
 from csv import reader
 import os.path
 import re
-from sys import argv
+from sys import argv, version
 
 URLREGEX = re.compile(
     '^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*'
@@ -40,7 +40,7 @@ def get_data(url):
   if 'application/json' in content_type:
     return r.json()
   elif 'text/csv' in content_type or 'text/plain' in content_type:
-    return [row for row in reader(r.content.splitlines())]
+    return [row for row in reader(r.text.splitlines())]
   else:
     print('Unhandled content-type: ' + content_type)
     return
@@ -79,7 +79,10 @@ def csv_to_json(csv_input, outfile=None):
   if outfile is not None:
     from io import open
     with open(outfile, 'w', encoding='utf-8') as f:
-      f.write(unicode(dumps(data, ensure_ascii=False)))
+      if version < '3':
+        f.write(unicode(dumps(data, ensure_ascii=False)))
+      else:
+        f.write(dumps(data, ensure_ascii=False))
       print('Done. JSON saved in ' + os.path.basename(outfile))
   else:
     return data
@@ -88,9 +91,5 @@ if __name__ == '__main__':
   if len(argv) <= 1:
     print('Usage: python cjswitch '
           '<url or path to csv> <optional:outfile path>')
-    exit()
-
-  if len(argv) == 2:
-    csv_to_json(argv[1])
   else:
-    csv_to_json(argv[1], argv[2])
+    csv_to_json(*argv)
