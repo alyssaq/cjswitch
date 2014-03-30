@@ -4,13 +4,12 @@
 """
   Author: Alyssa Quek 2014
 """
-
-import requests
-from json import dumps
-from csv import reader
 import os.path
 import re
+import requests
+import json
 from sys import argv, version
+from csv import reader
 
 URLREGEX = re.compile(
     '^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*'
@@ -28,7 +27,7 @@ def get_data(url):
      get_data('http://blah.co/data.csv')
   """
   try:
-    r = requests.get(url)
+    r = requests.get(url, headers={'Connection':'close'})
   except Exception as err:
     print(__file__ + ': Could not get data from ' + url)
     raise err
@@ -57,6 +56,18 @@ def load_csv(infile):
   with open(infile, 'rU') as f:
     return [row for row in reader(f)]
 
+def load_json(infile):
+  """ Load JSON file on disk
+
+  Args:
+    infile (str): full file path to json file
+
+  Example:
+    load_json(os.path.join(os.path.dirname(__file__), 'data.json'))
+  """
+  with open(infile) as json_file:
+    return json.load(json_file)
+
 def csv_to_json(csv_input, outfile=None):
   """ Main function to convert CSV from disk or url to JSON file.
 
@@ -80,9 +91,9 @@ def csv_to_json(csv_input, outfile=None):
     from io import open
     with open(outfile, 'w', encoding='utf-8') as f:
       if version < '3':
-        f.write(unicode(dumps(data, ensure_ascii=False)))
+        f.write(unicode(json.dumps(data, ensure_ascii=False)))
       else:
-        f.write(dumps(data, ensure_ascii=False))
+        f.write(json.dumps(data, ensure_ascii=False))
       print('Done. JSON saved in ' + os.path.basename(outfile))
   else:
     return data

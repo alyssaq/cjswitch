@@ -22,7 +22,7 @@ Runs and tested on Python 2.7.x and 3.3.x
 ['3', 'darkness', 'black'], ['4', 'mystical', 'sapphire blue']]
 
 # Download CSV from url and save to JSON file
->>> csv_to_json('http://www.andrewpatton.com/fantasy.csv', 'data/fantasy.json')
+>>> csv_to_json('https://raw.github.com/alyssaq/cjswitch/master/fantasy.csv', 'data/fantasy.json')
 Done. JSON saved in fantasy.json
 
 # Load CSV from disk and save to JSON file
