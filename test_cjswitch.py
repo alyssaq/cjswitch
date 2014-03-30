@@ -18,6 +18,7 @@ class CjSwitchTest(unittest.TestCase):
                             ['2', 'plain', 'white'],
                             ['3', 'darkness', 'black'],
                             ['4', 'mystical', 'sapphire blue']]
+
   @classmethod
   def tearDownClass(self):
     if os.path.isfile(self.outfile):

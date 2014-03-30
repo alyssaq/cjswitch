@@ -27,7 +27,7 @@ def get_data(url):
      get_data('http://blah.co/data.csv')
   """
   try:
-    r = requests.get(url, headers={'Connection':'close'})
+    r = requests.get(url, headers={'Connection': 'close'})
   except Exception as err:
     print(__file__ + ': Could not get data from ' + url)
     raise err
